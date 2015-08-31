@@ -33,7 +33,9 @@ tokens.forEach(function(token, i) {
                 channel: channel,
                 text: data.text,
                 username: data.username + ' @ ' + teamName,
-                icon_url: data.iconUrl
+                icon_url: data.iconUrl,
+                unfurl_links: true,
+                unfurl_media: true
             }
             slack.forEach(function(slack) {
                 if(slack.token !== self.token) {
@@ -41,5 +43,31 @@ tokens.forEach(function(token, i) {
                 }
             })
         }
+    });
+
+    slack[i].on('file_shared', function(data) {
+        self = this;
+        var teamName = self.slackData.team.name;
+        var user = self.getUser(data.file.user);
+
+        if(user) {
+            data.iconUrl = user.profile.image_48;
+            data.username = user.name;
+        }
+
+        var message = {
+            channel: channel,
+            text: '*' + data.file.title + '* ' + data.file.url,
+            username: data.username + ' @ ' + teamName,
+            icon_url: data.iconUrl,
+            unfurl_links: true,
+            unfurl_media: true
+        }
+        slack.forEach(function(slack) {
+            if(slack.token !== self.token) {
+                slack.reqAPI('chat.postMessage', message);
+            }
+        })
+
     });
 });
