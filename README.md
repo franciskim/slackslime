@@ -14,3 +14,8 @@ to provide the community Slack team http://devanz.co a way to communicate with o
 - https://github.com/xBytez/slackbotapi `npm install slackbotapi`
 - some manual config
 
+# to-do
+- @mentions formatting
+- editing of messages
+- many others, I'm sure
+- take over the world
