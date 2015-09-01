@@ -1,11 +1,22 @@
+/*
+ https://github.com/franciskim/slackslime
+ by Francis Kim @ franciskim.co
+
+ how to run from the shell:
+ nodejs [channel name] [RTM API token 1] [RTM API token 2] [RTM API token 3] [more tokens]
+
+ for example:
+ nodejs devchat xoxb-1111111111-xxx xoxb-2222222222-xxx xoxb-3333333333-xxx
+
+ or for PM2:
+ pm2 start slackslime.js -- devchat xoxb-1111111111-xxx xoxb-2222222222-xxx xoxb-3333333333-xxx
+*/
+
 var slackAPI = require('slackbotapi');
 
-var channel = '#slackslime';
-var tokens = [
-    'xoxb-1111111111-xxxxxxxxxxxxxxxxxxxxxxxx',
-    'xoxb-2222222222-xxxxxxxxxxxxxxxxxxxxxxxx',
-    'xoxb-3333333333-xxxxxxxxxxxxxxxxxxxxxxxx'
-];
+// parse command line arguments
+var channel = '#' + process.argv[2];
+var tokens = process.argv.slice(3);
 
 var slack = new Array();
 
@@ -28,7 +39,7 @@ tokens.forEach(function(token, i) {
         }
 
         if(!data.subtype) {
-            // normal user message
+            // relay normal user message
             var message = {
                 channel: channel,
                 text: data.text,
@@ -46,6 +57,7 @@ tokens.forEach(function(token, i) {
     });
 
     slack[i].on('file_shared', function(data) {
+        // share public link of a shared file
         self = this;
         var teamName = self.slackData.team.name;
         var user = self.getUser(data.file.user);
