@@ -4,12 +4,12 @@ a very quick Slackline.io clone using Node.js
 ![Slack Slime](slackslime.png?raw=true "Slack Slime")
 
 # what it does
-it allows cross-team/cross-organisation/cross-domain (all the same things) communication of a Slack channel
+it allows your channel to talk to multiple external Slack teams/organisations
 
 ![Screenshot](screenshot.png?raw=true "Screenshot")
 
 # requirements
-- 2+ Slack channels & RTM API tokens
+- 2+ Slack teams & RTM API tokens - get your token at https://my.slack.com/services/new/bot
 - Node.js
 - https://github.com/xBytez/slackbotapi `npm install slackbotapi`
 - some manual config
