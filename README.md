@@ -1,5 +1,5 @@
 # Slack Slime
-a very quick Slackline.io clone using Node.js
+cross-team/organisation communication on Slack
 
 ![Slack Slime](slackslime.png?raw=true "Slack Slime")
 
