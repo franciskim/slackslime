@@ -4,7 +4,7 @@ a very quick Slackline.io clone using Node.js
 ![Slack Slime](slackslime.png?raw=true "Slack Slime")
 
 # what it does
-it allows cross-team communication of Slack chats
+it allows cross-team/cross-organisation/cross-domain (all the same things) communication of a Slack channel
 
 ![Screenshot](screenshot.png?raw=true "Screenshot")
 
