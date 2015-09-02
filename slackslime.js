@@ -10,28 +10,29 @@
 
  or for PM2:
  pm2 start slackslime.js -- devchat xoxb-1111111111-xxx xoxb-2222222222-xxx xoxb-3333333333-xxx
-*/
+ */
 
 var slackAPI = require('slackbotapi');
 
+var slackslime = {}; // config object
 // parse command line arguments
-var channel = '#' + process.argv[2];
-var tokens = process.argv.slice(3);
+slackslime.channelName = process.argv[2];
+slackslime.tokens = process.argv.slice(3);
 
-var slack = new Array();
+var slack = new Array(); // slack connections get stored here
 
-tokens.forEach(function(token, i) {
-    console.log('Starting Slack ' + i);
+slackslime.tokens.forEach(function(token, i) {
     slack[i] = new slackAPI({
         'token': token,
         'logging': true
     });
 
     slack[i].on('message', function(data) {
-        if(typeof data.text === 'undefined' || data.subtype === 'bot_message') return;
-        self = this;
+        var self = this;
         var teamName = self.slackData.team.name;
+        var channel = self.getChannel(data.channel);
         var user = self.getUser(data.user);
+        if(typeof data.text === 'undefined' || data.subtype === 'bot_message' || channel.name !== slackslime.channelName) return;
 
         if(user) {
             data.iconUrl = user.profile.image_48;
@@ -39,15 +40,15 @@ tokens.forEach(function(token, i) {
         }
 
         if(!data.subtype) {
-            // relay normal user message
+            // normal user message
             var message = {
-                channel: channel,
+                channel: '#' + slackslime.channelName,
                 text: data.text,
                 username: data.username + ' @ ' + teamName,
                 icon_url: data.iconUrl,
                 unfurl_links: true,
                 unfurl_media: true
-            }
+            };
             slack.forEach(function(slack) {
                 if(slack.token !== self.token) {
                     slack.reqAPI('chat.postMessage', message);
@@ -57,10 +58,11 @@ tokens.forEach(function(token, i) {
     });
 
     slack[i].on('file_shared', function(data) {
-        // share public link of a shared file
-        self = this;
+        var self = this;
         var teamName = self.slackData.team.name;
+        var channel = self.getChannel(data.file.channels.splice(-1)[0]); // https://api.slack.com/types/file
         var user = self.getUser(data.file.user);
+        if(channel.name !== slackslime.channelName) return;
 
         if(user) {
             data.iconUrl = user.profile.image_48;
@@ -68,18 +70,18 @@ tokens.forEach(function(token, i) {
         }
 
         var message = {
-            channel: channel,
+            channel: '#' + slackslime.channelName,
             text: '*' + data.file.title + '* ' + data.file.url,
             username: data.username + ' @ ' + teamName,
             icon_url: data.iconUrl,
             unfurl_links: true,
             unfurl_media: true
-        }
+        };
+
         slack.forEach(function(slack) {
             if(slack.token !== self.token) {
                 slack.reqAPI('chat.postMessage', message);
             }
         })
-
     });
 });
