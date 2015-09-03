@@ -24,7 +24,7 @@ var slack = new Array(); // slack connections get stored here
 slackslime.tokens.forEach(function(token, i) {
     slack[i] = new slackAPI({
         'token': token,
-        'logging': true
+        'logging': false
     });
 
     slack[i].on('message', function(data) {
