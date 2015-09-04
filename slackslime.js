@@ -39,7 +39,19 @@ slackslime.tokens.forEach(function(token, i) {
             data.username = user.name;
         }
 
-        if(!data.subtype) {
+        if(data.text.charAt(0) === '!') {
+            // Bot/Channel commands will go here
+            // Split the command and its arguments into an array
+            var command = data.text.substring(1).split(' ');
+            switch(command[0].toLowerCase()) {
+                // If hello
+                case "users":
+                    // list users
+                    break;
+            }
+        }
+
+        else if(!data.subtype) {
             // normal user message
             var message = {
                 channel: '#' + slackslime.channelName,
