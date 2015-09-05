@@ -22,17 +22,23 @@ slackslime.tokens = process.argv.slice(3);
 var slack = new Array(); // slack connections get stored here
 
 slackslime.tokens.forEach(function(token, i) {
+
     slack[i] = new slackAPI({
         'token': token,
         'logging': false
     });
+
+    slack[i].on('hello', function(data) {
+        var self = this;
+        this.channelId = self.getChannel(slackslime.channelName).id;
+    })
 
     slack[i].on('message', function(data) {
         var self = this;
         var teamName = self.slackData.team.name;
         var channel = self.getChannel(data.channel);
         var user = self.getUser(data.user);
-        if(typeof data.text === 'undefined' || data.subtype === 'bot_message' || channel.name !== slackslime.channelName) return;
+        if(typeof data.text === 'undefined' || data.subtype === 'bot_message' || !channel || channel.name !== slackslime.channelName) return;
 
         if(user) {
             data.iconUrl = user.profile.image_48;
@@ -44,9 +50,18 @@ slackslime.tokens.forEach(function(token, i) {
             // Split the command and its arguments into an array
             var command = data.text.substring(1).split(' ');
             switch(command[0].toLowerCase()) {
-                // If hello
                 case "users":
-                    // list users
+                    slack.forEach(function(s) {
+                        s.reqAPI('channels.info', {channel: s.channelId}, function(d) {
+                            if(d.ok) {
+                                d.channel.members.forEach(function(user) {
+                                    if(s.getUser(user)) {
+                                        self.sendPM(data.user, '`' + s.slackData.team.name + '` ' + s.getUser(user).name);
+                                    }
+                                })
+                            }
+                        });
+                    });
                     break;
             }
         }
@@ -96,4 +111,5 @@ slackslime.tokens.forEach(function(token, i) {
             }
         })
     });
+    
 });
