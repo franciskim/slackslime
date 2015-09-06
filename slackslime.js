@@ -6,10 +6,10 @@
  nodejs [channel name] [RTM API token 1] [RTM API token 2] [RTM API token 3] [more tokens]
 
  for example:
- nodejs devchat xoxb-1111111111-xxx xoxb-2222222222-xxx xoxb-3333333333-xxx
+ nodejs devchat xoxb-1111111111-xxxxxxx xoxb-2222222222-xxxxxxx xoxb-3333333333-xxxxxxx
 
  or for PM2:
- pm2 start slackslime.js -- devchat xoxb-1111111111-xxx xoxb-2222222222-xxx xoxb-3333333333-xxx
+ pm2 start slackslime.js -- [channel name] [RTM API token 1] [RTM API token 2] [RTM API token 3] [more tokens]
  */
 
 var slackAPI = require('slackbotapi');
@@ -111,5 +111,5 @@ slackslime.tokens.forEach(function(token, i) {
             }
         })
     });
-    
+
 });
