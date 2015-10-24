@@ -1,7 +1,7 @@
 Slack Slime
 ===========
 
-[![GitHub Stars](https://img.shields.io/github/stars/franciskim/slackslime.svg?style=flat-square)](https://github.com/franciskim/slackslime/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/franciskim/slackslime.svg?style=flat-square)](https://github.com/franciskim/slackslime/issues) [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/franciskim/slackslime/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/franciskim/slackslime/blob/master/LICENSE) [![Current Version](https://img.shields.io/npm/v/slackslime.svg?style=flat-square)](https://npmjs.com/slackslime)
 
 cross-team/organisation communication on Slack
 
