@@ -10,7 +10,7 @@
 
  or for PM2:
  pm2 start slackslime.js -- devchat xoxb-1111111111-xxx xoxb-2222222222-xxx xoxb-3333333333-xxx
- */
+*/
 
 var slackAPI = require('slackbotapi');
 
@@ -40,49 +40,58 @@ slackslime.tokens.forEach(function(token, i) {
 
     slacks[i].on('message', function(data) {
         var self = this;
+        var user = self.getUser(data.user);
         var teamName = self.slackData.team.name;
         var channel = self.getChannel(data.channel);
-        var user = self.getUser(data.user);
-        if(typeof data.text === 'undefined' || data.subtype === 'bot_message' || !channel || channel.name !== slackslime.channelName) return;
-
+        
+        if(typeof data.text === 'undefined' || data.subtype === 'bot_message' || !channel || channel.name !== slackslime.channelName) {
+            return;
+        }
+        
         if(user) {
-            data.iconUrl = user.profile.image_48;
             data.username = user.name;
+            data.iconUrl = user.profile.image_48;
         }
 
         if(data.text.charAt(0) === '!') {
-            // Bot/Channel commands will go here
-            // Split the command and its arguments into an array
+            // bot/channel commands should go here
+            // split the command and its arguments into an array
             var command = data.text.substring(1).split(' ');
+            
             switch(command[0].toLowerCase()) {
                 case "list":
-                    // Send a list of all users on every chat and send via DM/PM
+                    // send a list of all users on every chat and send via DM/PM
                     var message = '', awayCount = 0, activeCount = 0, userCount = 0;
+                    
                     slacks.forEach(function(s) {
                         s.reqAPI('channels.info', {channel: s.channelId}, function(d) {
                             if(d.ok) {
                                 d.channel.members.forEach(function(user) {
                                     if(s.getUser(user)) {
-                                        userCount++;
                                         var status = ':question:';
+                                        userCount++;
+                                        
                                         if(s.getUser(user).presence === 'active') {
-                                            activeCount++;
                                             status = ':large_blue_circle:';
+                                            activeCount++;
                                         }
+                                        
                                         if(s.getUser(user).presence === 'away') {
-                                            awayCount++;
                                             status = ':white_circle:';
+                                            awayCount++;
                                         }
-                                        message += status + ' `' + s.slackData.team.name + '` '
-                                            + s.getUser(user).name + '\n'
+                                        
+                                        message += status + ' `' + s.slackData.team.name + '` ' + s.getUser(user).name + '\n';
                                     }
                                 })
                             }
                         });
                     });
+                    
                     self.sendPM(data.user,
                         '```Gathering a list of users, please wait...\nBlue = Active   White = Away```'
                     );
+                    
                     setTimeout(function() {
                         self.sendPM(data.user,
                             message + '```Active: ' + activeCount + '   Total: ' + userCount + '   Teams: '
@@ -94,7 +103,7 @@ slackslime.tokens.forEach(function(token, i) {
         }
 
         else if(!data.subtype) {
-            // This is a normal user message, send to other teams
+            // this is a normal user message, send to other teams
             var message = {
                 channel: '#' + slackslime.channelName,
                 text: data.text,
@@ -103,6 +112,7 @@ slackslime.tokens.forEach(function(token, i) {
                 unfurl_links: true,
                 unfurl_media: true
             };
+            
             slacks.forEach(function(slack) {
                 if(slack.token !== self.token) {
                     slack.reqAPI('chat.postMessage', message);
@@ -112,18 +122,21 @@ slackslime.tokens.forEach(function(token, i) {
     });
 
     slacks[i].on('file_shared', function(data) {
-        // Message to other teams the file shared
-        // Shared files in public channels already have a public URL (!)
-        // TODO: ask if the file should be shared
+        // send the shared file to other teams
+        // shared files in public channels already have a public URL (!)
+        // todo: ask if the file should be shared
         var self = this;
+        var user = self.getUser(data.file.user);
         var teamName = self.slackData.team.name;
         var channel = self.getChannel(data.file.channels.splice(-1)[0]); // https://api.slack.com/types/file
-        var user = self.getUser(data.file.user);
-        if(channel.name !== slackslime.channelName) return;
+        
+        if(channel.name !== slackslime.channelName) {
+            return;
+        }
 
         if(user) {
-            data.iconUrl = user.profile.image_48;
             data.username = user.name;
+            data.iconUrl = user.profile.image_48;
         }
 
         var message = {
