@@ -10,13 +10,21 @@
     "type": "git",
     "url": "git+https://github.com/franciskim/slackslime.git"
   },
-  "author": "",
+  "author": "Francis Kim <hello@franciskim.co> (https://franciskim.co/)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/franciskim/slackslime/issues"
   },
   "homepage": "https://github.com/franciskim/slackslime#readme",
+  "keywords": [
+    "slack",
+    "chat",
+    "bot",
+    "rtm",
+    "cross-team",
+    "cross-organisation"
+  ],
   "dependencies": {
-    "slackbotapi": "^1.3.4"
+    "slackbotapi": "^1.3.7"
   }
 }
