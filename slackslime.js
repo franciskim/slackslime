@@ -150,6 +150,7 @@ slackslime.tokens.forEach(function(token, i) {
     }
 
     var uploadSlackFile = function(upload_options, callback) {
+        // this method is here because slackbotapi library can't handle file uploads
         request.post({
             url: 'https://slack.com/api/files.upload',
             formData: upload_options,
@@ -172,23 +173,16 @@ slackslime.tokens.forEach(function(token, i) {
             return;
         }
 
+        if(user.is_bot) {
+            return; //otherwise we risk an infinite loop
+        }
+
         if(user) {
             data.username = user.name;
             data.iconUrl = user.profile.image_48;
         }
 
-        
 
-
-        var options = {
-          "method": "GET",
-          "hostname": "files.slack.com",
-          "path": "~/_SUPERVISORD/slackslime/" + data.file.name,
-          "rejectUnauthorized": "false",
-          "headers": {
-              "Authorization": "Bearer " + self.token
-          }
-        }
 
         var download_options = {
             url: data.file.url_private,
@@ -206,7 +200,6 @@ slackslime.tokens.forEach(function(token, i) {
 
          
             console.log("GONNA POST MESSAGE");
-            console.log(message);
 
 
             slacks.forEach(function(slack) {
