@@ -14,7 +14,6 @@
 
 var slackAPI = require('slackbotapi');
 var tmp = require('tmp');
-var FormData = require('form-data');
 var fs = require('fs');
 var request = require('request');
 
@@ -150,7 +149,7 @@ slackslime.tokens.forEach(function(token, i) {
     }
 
     var uploadSlackFile = function(upload_options, callback) {
-        // this method is here because slackbotapi library can't handle file uploads
+        // this method is here because slackbotapi library can't seem to handle file uploads
         request.post({
             url: 'https://slack.com/api/files.upload',
             formData: upload_options,
@@ -158,7 +157,6 @@ slackslime.tokens.forEach(function(token, i) {
             callback(err, response);
         });
     }
-
 
 
     var onFileShare = function(self, data) {
@@ -177,41 +175,34 @@ slackslime.tokens.forEach(function(token, i) {
             return; //otherwise we risk an infinite loop
         }
 
-        if(user) {
+        if(user) { // unfortunately image uploads don't support as-user avatar changes
             data.username = user.name;
             data.iconUrl = user.profile.image_48;
         }
 
-
-
         var download_options = {
             url: data.file.url_private,
-            directory: './tmp/',
+            directory: tmpobj.name,
             filename: data.file.name,
             token: self.token
         };
 
         var downloaded_file_path = downloadSlackFile(download_options, function() {
 
-            console.log("downloaded!"); 
-
-            var form = new FormData();
-            form.append('my_file', fs.createReadStream(download_options.directory + download_options.filename));
-
-         
-            console.log("GONNA POST MESSAGE");
-
+            var fileStream = fs.createReadStream(download_options.directory + download_options.filename);
 
             slacks.forEach(function(slack) {
-                if(slack.token !== self.token) {
+                if(slack.token !== self.token) { // so we don't send it to ourselves
+
                     var upload_options = {
                         token: slack.token,
                         channels: "#" + slackslime.channelName,
                         filename: data.file.name,
-                        username: data.username + ' @ ' + teamName,
+                        title: data.username + ' @ ' + teamName + " posted: " + data.file.name,
                         filetype: "auto",
-                        file: fs.createReadStream(download_options.directory + download_options.filename)
-                    };
+                        file: fileStream
+                      };
+
                     uploadSlackFile(upload_options, function(err, response) {
                          console.log(response);
                     });
@@ -219,7 +210,6 @@ slackslime.tokens.forEach(function(token, i) {
             })
 
         });
-    //tmpobj.name
 
     }
 });
