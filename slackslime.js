@@ -184,24 +184,32 @@ slackslime.tokens.forEach(function(token, i) {
             token: self.token
         };
 
+
+
         var downloaded_file_path = downloadSlackFile(download_options, function() {
 
-            var fileStream = fs.createReadStream(download_options.directory + download_options.filename);
+            var initial_comment = "From " + data.username + ' @ ' +  teamName;
+            if(data.file.comments_count > 0) {
+              initial_comment += ":\n \"" + data.file.initial_comment.comment + "\"";
+            }
+
+            var upload_options = {
+                channels: "#" + slackslime.channelName,
+                filename: data.file.name,
+                title: data.username + ' @ ' + teamName + " posted: " + data.file.name,
+                filetype: "auto",
+                initial_comment: initial_comment,
+                file: fs.createReadStream(download_options.directory + download_options.filename)
+            };
+
 
             slacks.forEach(function(slack) {
                 if(slack.token !== self.token) { // so we don't send it to ourselves
 
-                    var upload_options = {
-                        token: slack.token,
-                        channels: "#" + slackslime.channelName,
-                        filename: data.file.name,
-                        title: data.username + ' @ ' + teamName + " posted: " + data.file.name,
-                        filetype: "auto",
-                        file: fileStream
-                      };
+                    var this_upload_options = upload_options;
+                    this_upload_options['token'] = slack.token;
 
-                    uploadSlackFile(upload_options, function(err, response) {
-                         console.log(response);
+                    uploadSlackFile(this_upload_options, function(err, response) {
                     });
                 }
             })
