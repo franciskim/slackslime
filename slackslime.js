@@ -48,7 +48,8 @@ slackslime.tokens.forEach(function(token, i) {
 
 
         // handle file_share message subtypes instead of file_shared events because Slack's API doesn't seem to send much info with file_shared anymore.
-        if(data.subtype === 'file_share') {
+        if(data.files) {
+            data.file = data.files[0]
             onFileShare(this, data);
             return;
         }
